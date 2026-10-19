@@ -3,7 +3,6 @@ import { errors } from '@strapi/utils';
 import { isSsoLocked } from '../utils/sso-lock';
 import {
   assignResetPasswordToken,
-  assertResetPasswordTokenIsValid,
   completePasswordReset,
 } from '../../../../server/src/services/auth';
 
@@ -63,8 +62,6 @@ const resetPassword = async ({ resetPasswordToken, password }: any = {}) => {
   if (!matchingUser || (await isSsoLocked(matchingUser))) {
     throw new ApplicationError();
   }
-
-  await assertResetPasswordTokenIsValid(matchingUser);
 
   return completePasswordReset(matchingUser, password);
 };
