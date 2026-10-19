@@ -90,7 +90,7 @@ export const verify = (auth: any, config: any) => {
     }
 
     const scopes = castArray(config.scope);
-    const isAllowed = scopes.every((scope: string) => ability.can(scope));
+    const isAllowed = scopes.some((scope: string) => ability.can(scope));
 
     if (isAllowed === true) {
       return;
