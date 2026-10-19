@@ -70,10 +70,6 @@ const buildPrefixKey = (ctx) => {
     }
   }
 
-  if (!routeUsesEmailIdentifier(requestPath)) {
-    return `noIdentifier:${requestPath}:${ctx.request.ip}`;
-  }
-
   const userIdentifier = getEmailIdentifierForKey(ctx.request.body);
   return `${userIdentifier}:${requestPath}:${ctx.request.ip}`;
 };
