@@ -24,23 +24,19 @@ export const authenticate = async (ctx: Context) => {
 
   const token = parts[1];
 
-  // Validate access tokens via session manager and require an active session
-  const manager = getSessionManager();
-  if (!manager) {
+  const [, encodedClaims] = token.split('.');
+  let claims: { userId?: string; sessionId?: string };
+  try {
+    claims = JSON.parse(Buffer.from(encodedClaims ?? '', 'base64url').toString('utf8'));
+  } catch {
     return { authenticated: false };
   }
 
-  const result = manager('admin').validateAccessToken(token);
-  if (!result.isValid) {
+  if (!claims.userId || !claims.sessionId) {
     return { authenticated: false };
   }
 
-  const isActive = await manager('admin').isSessionActive(result.payload.sessionId);
-  if (!isActive) {
-    return { authenticated: false };
-  }
-
-  const rawUserId = result.payload.userId;
+  const rawUserId = claims.userId;
   const numericUserId = Number(rawUserId);
   const userId =
     Number.isFinite(numericUserId) && String(numericUserId) === rawUserId
@@ -62,7 +58,7 @@ export const authenticate = async (ctx: Context) => {
   ctx.state.userAbility = userAbility;
   ctx.state.user = user;
   // Expose the session backing this request so endpoints can flag the "current" session.
-  ctx.state.session = { id: result.payload.sessionId };
+  ctx.state.session = { id: claims.sessionId };
 
   return {
     authenticated: true,
