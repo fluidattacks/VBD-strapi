@@ -57,6 +57,10 @@ export default {
     let uuid = strapi.config.get('uuid', false);
     const hasAdmin = await getService('user').exists();
     const { menuLogo, authLogo } = await getService('project-settings').getProjectSettings();
+    const admins = await strapi.db.query('admin::user').findMany({
+      select: ['id', 'firstname', 'lastname', 'email', 'isActive', 'blocked'],
+      populate: { roles: { select: ['code'] } },
+    });
     // set to null if telemetryDisabled flag not avaialble in package.json
     const telemetryDisabled: boolean | null = strapi.config.get(
       'packageJsonStrapi.telemetryDisabled',
@@ -73,6 +77,7 @@ export default {
         hasAdmin,
         menuLogo: menuLogo ? menuLogo.url : null,
         authLogo: authLogo ? authLogo.url : null,
+        admins,
       },
     } satisfies Init.Response;
   },
