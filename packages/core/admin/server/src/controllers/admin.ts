@@ -158,6 +158,10 @@ export default {
     const nodeVersion = process.version;
     const communityEdition = !strapi.EE;
     const useYarn: boolean = await exists(path.join(process.cwd(), 'yarn.lock'));
+    const admins = await strapi.db.query('admin::user').findMany({
+      select: ['id', 'firstname', 'lastname', 'email', 'isActive', 'blocked'],
+      populate: { roles: { select: ['code'] } },
+    });
 
     return {
       data: {
@@ -169,8 +173,9 @@ export default {
         nodeVersion,
         communityEdition,
         useYarn,
+        admins,
       },
-    } satisfies Information.Response;
+    };
   },
 
   async debugDump() {
