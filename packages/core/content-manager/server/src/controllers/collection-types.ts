@@ -489,11 +489,6 @@ export default {
       return;
     }
 
-    // if the user has condition that needs populated content, it's not applied because entity don't have relations populated
-    if (permissionChecker.cannot.read(version)) {
-      return ctx.forbidden();
-    }
-
     // TODO: Count populated relations by permissions
     const sanitizedDocument = await permissionChecker.sanitizeOutput(version);
     ctx.body = await formatDocumentWithMetadata(permissionChecker, model, sanitizedDocument);
